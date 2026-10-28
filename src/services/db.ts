@@ -210,11 +210,11 @@ export async function deleteProject(id: string): Promise<void> {
 export async function getServices(onlyPublished: boolean = true): Promise<Service[]> {
   const path = 'services';
   try {
-    const snap = await getDocs(collection(db, 'services'));
-    let list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Service));
-    if (onlyPublished) {
-      list = list.filter(s => s.published);
-    }
+    const q = onlyPublished
+      ? query(collection(db, 'services'), where('published', '==', true))
+      : collection(db, 'services');
+    const snap = await getDocs(q);
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Service));
     return list.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   } catch (error) {
     handleFirestoreError(error, OperationType.LIST, path);
@@ -262,11 +262,11 @@ export async function deleteService(id: string): Promise<void> {
 export async function getTestimonials(onlyPublished: boolean = true): Promise<Testimonial[]> {
   const path = 'testimonials';
   try {
-    const snap = await getDocs(collection(db, 'testimonials'));
-    let list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Testimonial));
-    if (onlyPublished) {
-      list = list.filter(t => t.published);
-    }
+    const q = onlyPublished
+      ? query(collection(db, 'testimonials'), where('published', '==', true))
+      : collection(db, 'testimonials');
+    const snap = await getDocs(q);
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Testimonial));
     return list.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   } catch (error) {
     handleFirestoreError(error, OperationType.LIST, path);
@@ -370,16 +370,53 @@ export async function deleteInquiry(id: string): Promise<void> {
 }
 
 // ========================
-// STORAGE UPLOAD HELPER
+// CLOUDINARY & STORAGE UPLOAD HELPER
 // ========================
-export async function uploadFileToStorage(file: File, folder: string = 'portfolio'): Promise<string> {
+export async function uploadToCloudinary(file: File, folder: string = 'portfolio'): Promise<string> {
+  const base64Data = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  try {
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image: base64Data,
+        folder,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      if (data.configured === false) {
+        console.warn('Cloudinary credentials not set in .env, falling back to Firebase Storage/base64.');
+        return await uploadToFirebaseStorage(file, folder);
+      }
+      throw new Error(data.error || 'Cloudinary upload failed.');
+    }
+
+    return data.url;
+  } catch (error) {
+    console.warn('Cloudinary upload endpoint returned an error, attempting fallback:', error);
+    return await uploadToFirebaseStorage(file, folder);
+  }
+}
+
+export async function uploadToFirebaseStorage(file: File, folder: string = 'portfolio'): Promise<string> {
   try {
     const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storageRef = ref(storage, `${folder}/${Date.now()}_${cleanName}`);
     const snapshot = await uploadBytes(storageRef, file);
     return await getDownloadURL(snapshot.ref);
   } catch (err) {
-    console.warn('Storage upload encountered an issue, falling back to base64 preview format for demonstration:', err);
+    console.warn('Firebase Storage upload failed, falling back to data URL:', err);
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
@@ -387,6 +424,11 @@ export async function uploadFileToStorage(file: File, folder: string = 'portfoli
       reader.readAsDataURL(file);
     });
   }
+}
+
+export async function uploadFileToStorage(file: File, folder: string = 'portfolio'): Promise<string> {
+  // Use Cloudinary as primary image uploader
+  return await uploadToCloudinary(file, folder);
 }
 
 // ========================

@@ -76,6 +76,9 @@ export default function App() {
       if (user) {
         const adminStatus = await checkIsUserAdmin(user);
         setIsAdmin(adminStatus);
+        if (adminStatus) {
+          loadDatabaseData(true);
+        }
       } else {
         setIsAdmin(false);
       }
@@ -84,44 +87,57 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Fetch all database records
-  const loadDatabaseData = useCallback(async () => {
+  // Fetch all database records (public for all, admin-only when authenticated)
+  const loadDatabaseData = useCallback(async (currentIsAdmin?: boolean) => {
     setDataLoading(true);
+    const adminCheck = typeof currentIsAdmin === 'boolean' ? currentIsAdmin : isAdmin;
     try {
+      // 1. Load public collections accessible to all visitors
       const [
         fetchedSettings,
         fetchedSections,
         publishedProjects,
-        allProjs,
         cats,
         servs,
         testis,
-        inqs
       ] = await Promise.all([
         getSiteSettings(),
         getHomepageSections(),
         getPublishedProjects(),
-        getAllProjects(),
         getCategories(),
-        getServices(true),
-        getTestimonials(true),
-        getInquiries().catch(() => []) // Inquiries may fail for non-admins due to rules
+        getServices(!adminCheck), // If admin, load all services; if public, load published only
+        getTestimonials(!adminCheck), // If admin, load all testimonials; if public, load published only
       ]);
 
       setSettings(fetchedSettings);
       setSections(fetchedSections);
       setProjects(publishedProjects);
-      setAllProjects(allProjs);
       setCategories(cats);
       setServices(servs);
       setTestimonials(testis);
-      setInquiries(inqs);
+
+      // 2. Load admin-restricted collections (all draft/published projects & client inquiries)
+      if (adminCheck) {
+        try {
+          const [allProjs, inqs] = await Promise.all([
+            getAllProjects(),
+            getInquiries()
+          ]);
+          setAllProjects(allProjs);
+          setInquiries(inqs);
+        } catch (adminErr) {
+          console.warn('Could not load admin collections:', adminErr);
+        }
+      } else {
+        setAllProjects(publishedProjects);
+        setInquiries([]);
+      }
     } catch (err) {
       console.error('Error fetching database collections:', err);
     } finally {
       setDataLoading(false);
     }
-  }, []);
+  }, [isAdmin]);
 
   useEffect(() => {
     loadDatabaseData();
@@ -237,7 +253,8 @@ export default function App() {
           theme={theme}
           onToggleTheme={toggleTheme}
           onSuccess={async () => {
-            await loadDatabaseData();
+            setIsAdmin(true);
+            await loadDatabaseData(true);
           }}
           onCancel={() => setViewMode('public')}
         />
@@ -253,7 +270,7 @@ export default function App() {
         testimonials={testimonials}
         settings={settings}
         sections={sections}
-        onRefreshData={loadDatabaseData}
+        onRefreshData={() => loadDatabaseData(true)}
         onBackToPublic={() => setViewMode('public')}
         theme={theme}
         onToggleTheme={toggleTheme}

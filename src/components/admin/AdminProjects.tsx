@@ -378,8 +378,8 @@ export const AdminProjects: React.FC<AdminProjectsProps> = ({
                 />
                 <div className="d-flex align-items-center gap-2">
                   <label className="btn btn-sm btn-outline-editorial text-uppercase m-0 cursor-pointer">
-                    <i className="bi bi-upload text-accent me-1"></i>
-                    Upload File to Storage
+                    <i className="bi bi-cloud-arrow-up text-accent me-1"></i>
+                    Upload via Cloudinary
                     <input
                       type="file"
                       accept="image/*"
@@ -387,7 +387,12 @@ export const AdminProjects: React.FC<AdminProjectsProps> = ({
                       onChange={(e) => handleFileUpload(e, 'thumbnail')}
                     />
                   </label>
-                  {uploadingImage === 'thumbnail' && <span className="spinner-border spinner-border-sm text-accent"></span>}
+                  {uploadingImage === 'thumbnail' && (
+                    <span className="small text-accent d-flex align-items-center gap-1">
+                      <span className="spinner-border spinner-border-sm" role="status"></span>
+                      <span>Uploading to Cloudinary...</span>
+                    </span>
+                  )}
                 </div>
                 {formData.thumbnailUrl && (
                   <div className="mt-2 border border-subtle overflow-hidden" style={{ width: '120px', height: '80px' }}>
@@ -408,8 +413,8 @@ export const AdminProjects: React.FC<AdminProjectsProps> = ({
                 />
                 <div className="d-flex align-items-center gap-2">
                   <label className="btn btn-sm btn-outline-editorial text-uppercase m-0 cursor-pointer">
-                    <i className="bi bi-upload text-accent me-1"></i>
-                    Upload Cover to Storage
+                    <i className="bi bi-cloud-arrow-up text-accent me-1"></i>
+                    Upload Cover via Cloudinary
                     <input
                       type="file"
                       accept="image/*"
@@ -417,7 +422,12 @@ export const AdminProjects: React.FC<AdminProjectsProps> = ({
                       onChange={(e) => handleFileUpload(e, 'cover')}
                     />
                   </label>
-                  {uploadingImage === 'cover' && <span className="spinner-border spinner-border-sm text-accent"></span>}
+                  {uploadingImage === 'cover' && (
+                    <span className="small text-accent d-flex align-items-center gap-1">
+                      <span className="spinner-border spinner-border-sm" role="status"></span>
+                      <span>Uploading to Cloudinary...</span>
+                    </span>
+                  )}
                 </div>
                 {formData.coverImageUrl && (
                   <div className="mt-2 border border-subtle overflow-hidden" style={{ width: '120px', height: '80px' }}>
@@ -428,7 +438,12 @@ export const AdminProjects: React.FC<AdminProjectsProps> = ({
 
               {/* Gallery Images Builder */}
               <div className="col-12 pt-3 border-top border-subtle">
-                <label className="form-label text-muted-custom text-uppercase small">Gallery Images & Process Artifacts</label>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  <label className="form-label text-muted-custom text-uppercase small mb-0">Gallery Images & Process Artifacts</label>
+                  <span className="text-muted-custom small" style={{ fontSize: '0.72rem' }}>
+                    <i className="bi bi-cloud-check text-accent me-1"></i> Cloudinary storage &amp; database persistence
+                  </span>
+                </div>
                 <div className="row g-2 mb-3">
                   <div className="col-md-6">
                     <input
@@ -456,8 +471,8 @@ export const AdminProjects: React.FC<AdminProjectsProps> = ({
                     >
                       Add URL
                     </button>
-                    <label className="btn btn-outline-editorial text-uppercase m-0" title="Upload image file to gallery">
-                      <i className="bi bi-upload text-accent"></i>
+                    <label className="btn btn-outline-editorial text-uppercase m-0" title="Upload image file to Cloudinary">
+                      <i className="bi bi-cloud-arrow-up text-accent"></i>
                       <input
                         type="file"
                         accept="image/*"
