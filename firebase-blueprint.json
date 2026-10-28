@@ -1,0 +1,166 @@
+{
+  "entities": {
+    "Project": {
+      "title": "Project",
+      "description": "Portfolio project showcase entry",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "slug": { "type": "string", "maxLength": 200 },
+        "shortDescription": { "type": "string", "maxLength": 500 },
+        "description": { "type": "string", "maxLength": 10000 },
+        "categoryId": { "type": "string", "maxLength": 128 },
+        "tags": { "type": "array" },
+        "clientName": { "type": "string", "maxLength": 200 },
+        "projectYear": { "type": "number" },
+        "services": { "type": "array" },
+        "thumbnailUrl": { "type": "string", "maxLength": 2048 },
+        "coverImageUrl": { "type": "string", "maxLength": 2048 },
+        "galleryImages": { "type": "array" },
+        "projectUrl": { "type": "string", "maxLength": 2048 },
+        "featured": { "type": "boolean" },
+        "published": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "seoTitle": { "type": "string", "maxLength": 200 },
+        "seoDescription": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["title", "slug", "published", "displayOrder"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Portfolio category for grouping projects",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "slug": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 },
+        "displayOrder": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "slug"]
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Global general settings for the portfolio site",
+      "type": "object",
+      "properties": {
+        "designerName": { "type": "string", "maxLength": 150 },
+        "logoUrl": { "type": "string", "maxLength": 2048 },
+        "heroTitle": { "type": "string", "maxLength": 250 },
+        "heroSubtitle": { "type": "string", "maxLength": 500 },
+        "heroImageUrl": { "type": "string", "maxLength": 2048 },
+        "aboutText": { "type": "string", "maxLength": 5000 },
+        "aboutImageUrl": { "type": "string", "maxLength": 2048 },
+        "email": { "type": "string", "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "whatsapp": { "type": "string", "maxLength": 50 },
+        "socialLinks": { "type": "object" },
+        "availabilityStatus": { "type": "string", "maxLength": 100 },
+        "cvUrl": { "type": "string", "maxLength": 2048 },
+        "seoTitle": { "type": "string", "maxLength": 200 },
+        "seoDescription": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Creative design service offered",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 150 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "startingPrice": { "type": "number" },
+        "displayOrder": { "type": "number" },
+        "published": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["title", "published"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "Client review and testimonial",
+      "type": "object",
+      "properties": {
+        "clientName": { "type": "string", "maxLength": 150 },
+        "designation": { "type": "string", "maxLength": 150 },
+        "company": { "type": "string", "maxLength": 150 },
+        "testimonialText": { "type": "string", "maxLength": 2000 },
+        "avatarUrl": { "type": "string", "maxLength": 2048 },
+        "published": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["clientName", "testimonialText", "published"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "Prospective client project inquiry submission",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 150 },
+        "email": { "type": "string", "maxLength": 200 },
+        "projectType": { "type": "string", "maxLength": 100 },
+        "estimatedBudget": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 5000 },
+        "status": { "type": "string", "maxLength": 50 },
+        "adminNotes": { "type": "string", "maxLength": 5000 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "email", "message"]
+    },
+    "HomepageSection": {
+      "title": "HomepageSection",
+      "description": "Configurable section on public homepage",
+      "type": "object",
+      "properties": {
+        "sectionKey": { "type": "string", "maxLength": 100 },
+        "title": { "type": "string", "maxLength": 200 },
+        "subtitle": { "type": "string", "maxLength": 300 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "enabled": { "type": "boolean" },
+        "displayOrder": { "type": "number" },
+        "contentType": { "type": "string", "maxLength": 50 },
+        "configuration": { "type": "object" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["sectionKey", "enabled", "displayOrder"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Collection of portfolio projects"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Categories for portfolio projects"
+    },
+    "/siteSettings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Global website settings"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Services offered by designer"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "Testimonial",
+      "description": "Client testimonials"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Client contact inquiries"
+    },
+    "/homepageSections/{sectionId}": {
+      "schema": "HomepageSection",
+      "description": "Configurable homepage sections"
+    }
+  }
+}

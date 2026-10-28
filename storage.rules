@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'gk9192101@gmail.com' ||
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Public read for portfolio images and documents
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin() &&
+                      request.resource.size < 15 * 1024 * 1024 &&
+                      (request.resource.contentType.matches('image/.*') || request.resource.contentType == 'application/pdf');
+    }
+  }
+}

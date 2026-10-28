@@ -1,0 +1,8 @@
+{
+  "name": "Graphic Designer Portfolio & Studio Manager",
+  "description": "Modern editorial graphic designer portfolio with public showcases, dynamic project filtering, client inquiries, and full admin dashboard management powered by Firebase Firestore and Storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
